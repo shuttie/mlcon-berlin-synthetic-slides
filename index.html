@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+	<title>Why you should [not] fine-tune on synthetic data</title>
+
+	<link rel="stylesheet" href="dist/reset.css">
+	<link rel="stylesheet" href="dist/reveal.css">
+	<link rel="stylesheet" href="dist/theme/beige.css">
+
+	<!-- Theme used for syntax highlighted code -->
+	<link rel="stylesheet" href="plugin/highlight/monokai.css">
+</head>
+
+<body>
+	<div class="reveal">
+		<div class="slides">
+			<section>
+				<h2>Why you should <span style="text-decoration: line-through;">not</span></h2>
+				<img src="img/synthetic.png" height="400px" style="margin: 0px;">
+				<h2 style="margin: 0px;">fine-tune on synthetic data</h2>
+				<br>
+				<small>MLCon Berlin 2024 | Roman Grebennikov</small>
+			</section>
+			<section>
+				<h2>whoami</h2>
+				<p>🔎</p>
+				<ul>
+					<li>PhD in CS, quant trading, credit scoring</li>
+					<li><strong>Findify</strong>: e-commerce search, personalization</li>
+					<li><strong>Delivery Hero</strong>: food search, LLMs</li>
+					<li><strong>Opensource</strong>: Metarank, lightgbm4j, <span
+							class="fragment highlight-red">Nixiesearch</span></li>
+				</ul>
+			</section>
+			<section>
+				<h2>Agenda</h2>
+				<ul>
+					<li>Fine-tuning with no training data?</li>
+					<li>Domain adaptation in search</li>
+					<li>Teaching your model to 说 إنجليزي </li>
+				</ul>
+			</section>
+			<section>
+				<h2>Nixiesearch</h2>
+				<p>A stateless search search engine</p>
+				<ul>
+					<li>Runs over S3 block storage</li>
+					<li>Domain adaptation: fine-tunes to your data</li>
+				</ul>
+				<img src="img/separate-indexer.png" height="200px">
+			</section>
+			<section>
+				<h2>Industry goes stateless</h2>
+				<ul>
+					<li><strong>Uber</strong>: Lucene: Uber’s Search Platform Version Upgrade [1]</li>
+					<li><strong>Doordash</strong>: Introducing DoorDash’s in-house search engine [2]</li>
+					<li><strong>Amazon</strong>: E-Commerce search at scale on Apache Lucene [3]</li>
+				</ul>
+				<p><img src="img/doordash.gif" height="250px" style="margin: 0px;"></p>
+				<p>
+					<small>[1]: <a
+							href="https://www.uber.com/en-NL/blog/lucene-version-upgrade/">https://www.uber.com/en-NL/blog/lucene-version-upgrade/</a></small>
+					<small>[2]: <a
+							href="https://careers.doordash.com/blog/introducing-doordashs-in-house-search-engine/">https://careers.doordash.com/blog/introducing-doordashs-in-house-search-engine/</a>
+					</small>
+					<small>[3]: <a
+							href="https://www.youtube.com/watch?v=EkkzSLstSAE">https://www.youtube.com/watch?v=EkkzSLstSAE</a></small>
+				</p>
+			</section>
+			<section>
+				<h2>Domain adaptation</h2>
+				<p>Different search engines, same embedding, same bad search results</p>
+			</section>
+		</div>
+	</div>
+
+	<script src="dist/reveal.js"></script>
+	<script src="plugin/notes/notes.js"></script>
+	<script src="plugin/markdown/markdown.js"></script>
+	<script src="plugin/highlight/highlight.js"></script>
+	<script>
+		// More info about initialization & config:
+		// - https://revealjs.com/initialization/
+		// - https://revealjs.com/config/
+		Reveal.initialize({
+			hash: true,
+			history: true,
+			controls: true,
+			progress: true,
+			width: 1200,
+			transition: 'none',
+			slideNumber: true,
+			// Learn about plugins: https://revealjs.com/plugins/
+			plugins: [RevealMarkdown, RevealHighlight, RevealNotes]
+		});
+	</script>
+</body>
+
+</html>
