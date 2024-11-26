@@ -74,6 +74,345 @@
 			<section>
 				<h2>Domain adaptation</h2>
 				<p>Different search engines, same embedding, same bad search results</p>
+				<img src="img/vector-search.png" height="500px" style="margin: 0px;">
+			</section>
+			<section>
+				<h2>Got bad lexical search results?</h2>
+				<p><img src="img/tomato.png" height="300px"></p>
+				<ul>
+					<li>Build a set of ground-truth labels</li>
+					<li>Tinker with a search until NDCG@10 goes up</li>
+					<li>PROFIT</li>
+				</ul>
+			</section>
+			<section>
+				<h2>Got bad embedding search results?</h2>
+				<p><img src="img/blackbox.png" height="400px"></p>
+				<p>Nothing to tinker with 🫠</p>
+			</section>
+			<section>
+				<h2>Fine-tuning?</h2>
+				<p><img src="img/tune.png" height="400px" style="margin: 0px;"></p>
+				<ul>
+					<li>Document corpus</li>
+					<li>Queries</li>
+					<li>Positive and negative labels</li>
+				</ul>
+			</section>
+			<section>
+				<h2>Fine-tuning reality check</h2>
+				<p><img src="img/incredible.png" height="400px" style="margin: 0px;"></p>
+				<ul>
+					<li><strong>Docs+queries+positives</strong>: mine negatives</li>
+					<li><strong>Docs+queries</strong>: mine negatives, generate labels</li>
+					<li><strong>Docs</strong>: generate queries+labels, mine negatives</li>
+				</ul>
+			</section>
+			<section>
+				<h2>Is it even doable?</h2>
+				<p>Too many synthetic things at once!</p>
+				<ul>
+					<li>Query generation - 🫠</li>
+					<li>Label generation - 🫠</li>
+					<li>Negative mining - 😺</li>
+				</ul>
+			</section>
+			<section>
+				<h2>docTTTTTquery</h2>
+				<p>github.com/castorini/docTTTTTquery</p>
+				<pre><code data-trim data-noescape class="language-python">
+					from transformers import T5Tokenizer, T5ForConditionalGeneration
+					model_id = 'castorini/doc2query-t5-base-msmarco'
+					tokenizer = T5Tokenizer.from_pretrained(model_id)
+					model = T5ForConditionalGeneration.from_pretrained(model_id)
+
+					doc_text = 'The presence of communication amid scientific minds was '
+						'equally important to the success of the Manhattan Project'
+						'as scientific intellect was. The only cloud hanging over '
+						'the impressive achievement of the atomic researchers and '
+						'engineers is what their success truly meant; hundreds '
+						'of thousands of innocent lives obliterated.'
+
+					input_ids = tokenizer.encode(doc_text, return_tensors='pt')
+					outputs = model.generate(input_ids, num_return_sequences=3)
+				</code></pre>
+				<pre><code data-trim data-noescape>
+					sample 1: why was the manhattan project successful
+					sample 2: the manhattan project what it means
+					sample 3: what was the most important aspect of the manhattan project
+				</code>
+			</section>
+			<section>
+				<h2>docTTTTTquery TLDR</h2>
+				<ul>
+					<li>Small T5 seq2seq model</li>
+					<li>Trained on query generation task</li>
+					<li><span class="fragment highlight-red">MSMARCO dataset</span>: <br>500k document-query pairs from Bing</li>
+				</ul>
+			</section>
+			<section>
+				<h2>doc2query reality check</h2>
+				<pre><code data-trim data-noescape class="language-python">
+				doc_text = "MLcon provides a focused, specialized learning environment "
+					"dedicated to Machine Learning, enabling attendees to explore the "
+					"latest trends, tools, and best practices with guidance from "
+					"international experts. Our events are designed to help professionals "
+					"elevate their skills, enhance their products, and improve effectiveness."
+				</code></pre>
+				<pre><code data-trim data-noescape>
+					sample 1: what is mlcon
+					sample 2: what is mlcon?
+					sample 3: what is mlcon?
+					sample 4: what is mlcon?
+					sample 5: what is mlcon
+					sample 6: what is mlcon
+					sample 7: what is mlcon
+					sample 8: what is mlcon
+					sample 9: what is mlcon
+					sample 10: what is mlcon?
+				</code></pre>
+			</section>
+			<section>
+				<h2>doc2query issues</h2>
+				<ul>
+					<li>T5 small: small, old and not smart</li>
+					<li>Only good on Bing search results</li>
+					<li>Very narrow query types: "what is XXX?"</li>
+				</ul>
+				<p>Ok, what about modern LLMs?</p>
+				<p><img src="img/llamas.jpg" height="200px"></p>
+			</section>
+			<section>
+				<h2>Modern LLMs for data generation</h2>
+				<ul>
+					<li class="fragment highlight-green">Fine-tune a-la docTTTTTquery</li>
+					<li class="fragment highlight-green">Prompt engineering: open-source LLMs</li>
+					<li>Prompt engineering: commercial LLMs</li>
+				</ul>
+			</section>
+			<section>
+				<h2>Attempt #1: let's fine-tune!</h2>
+				<p>Premise:</p>
+				<ul>
+					<li><strong>t5 small?</strong> - Let's pick bigger model, Mistral-7B</li>
+					<li><strong>too narrow queries?</strong> - diverse mix of doc+query pairs</li>
+					<li><strong>same query types?</strong> - let's have short/long/question modifiers</li>
+				</ul>
+				<p><img src="img/qgen-hf.png" height="300px"> </p>
+			</section>
+			<section>
+				<h2>nixie-querygen-v3</h2>
+				<img src="img/qgen-datasets.png">
+			</section>
+			<section>
+				<h2>generated query example</h2>
+				<pre><code data-trim data-noescape class="language-js">
+					{
+						"doc": "Hey guys. I am a Programmer Analyst Trainee at Cognizant "
+						       "Technology Solutions in the Advanced Java Domain. I joined Cognizant"
+							   "on 24th Dec 2015. I got an offer from Oracle Financial Services"
+							   "Software too as Associate Consutant. Should i join the latter or "
+							   "not. I am really confused pls i need a definitive direction to think. "
+							   "I feel coz i got a good domain (Advanced Java) in cognizant and i am "
+							   "quite good at Java programming i should not leave cognizant coz "
+							   "i am not sure what domain OFSS might put me in.",
+
+						"query": "should i join ofss or cognizent?"
+					}
+					  
+				</code></pre>
+				<p>Looks good, let's see the metrics!</p>
+			</section>
+			<section>
+				<h2>BEIR: Evaluating search</h2>
+				<ul>
+					<li>BEIR: a set of 14 datasets with relevance labels</li>
+					<li>Diverse topics: wiki, med, Q&A, finance, web</li>
+					<li>Diverse doc/query lengths: from short to long</li>
+				</ul>
+				<img src="img/beir.png" height="400px">
+			</section>
+			<section>
+				<h2>First results</h2>
+				<p><img src="img/beir-v3.png" height="400px"></p>
+				<p>Not impressive 💀 but why?</p>
+			</section>
+			<section>
+				<h2>Hypotheses why it worked bad</h2>
+				<ul>
+					<li><strong>e5-base-v2 is not zero-shot</strong>: uses train splits from BEIR</li>
+					<li><strong>Too much noise in training data</strong>: less datasets, more quality</li>
+					<li><strong>Generation quality is so-so</strong>: too typical queries</li>
+				</ul>
+				<br>
+				<p>Disclaimer: does not mean that this approach is broken</p>
+			</section>
+			<section>
+				<h2>Generated query examples</h2>
+				<pre><code data-trim data-noescape class="language-js">
+"Should bottled water be banned?"
+"Should the government allow illegal immigrants to become citizens?"
+"Should more gun control laws be enacted?"
+"Should adults have the right to carry a concealed handgun?"
+"Should the voting age be lowered?"
+"Should any vaccines be required for children?"
+"Should gay marriage be legal?"
+"Should performance-enhancing drugs be accepted in sports?"
+"Does lowering the federal corporate income tax rate create jobs?"
+"Should prostitution be legal?"
+"Should any vaccines be required for children?"
+"Should recreational marijuana be legal?"
+"Should the federal minimum wage be increased?"
+"Should people become vegetarian?"
+				</code></pre>
+				<p>Why does it always start with "should?" 🤔</p>
+			</section>
+			<section>
+				<h2>Attempt #2: prompt engineering</h2>
+				<ul>
+					<li>pro: different query types</li>
+					<li>pro: iteration time low, just change the LLM</li>
+					<li>con: prompt engineering is magic</li>
+				</ul>
+				<img src="img/prompt.jpg">
+			</section>
+			<section>
+				<h2>The plan</h2>
+				<ul>
+					<li>Multiple LLM sizes: Qwen2.5 7B and 32B</li>
+					<li>Pre-MTEB embedding model: all-MiniLM-L6-v2</li>
+					<li>NanoBEIR instead of BEIR: too slow :(</li>
+					<li>5k docs, 1 query per doc</li>
+					<li>OpenAI too expensive :( ~ $500</li>
+				</ul>
+				<pre><code data-trim data-noescape class="language-python">
+				query_prompt = [
+					"You are a search quality rater evaluating the relevance of web pages. "
+					"Given a document, provide a single search query in a form of a question, "
+					"which can be used to match this document in a search engine. "
+					"The document should be highly relevant for the query, "
+					"and directly contain the answer for the query. "
+					"Query should be a short English question, descriptive, and consider "
+					"the underlying intent of the query regarding the document. "
+					"Output only the query, without any extra text surrounding it. "
+				]
+				</code></pre>
+			</section>
+			<section>
+				<h2>It was done before!</h2>
+				<p>GPL: Generative Pseudo Labeling for Unsupervised Domain Adaptation of Dense Retrieval</p>
+				<img src="img/gpl.png" style="margin: 0px;">
+				<p><small>[1]: K.Wang et al, https://arxiv.org/abs/2112.07577</small></p>
+			</section>
+			<section>
+				<h2>Example queries: Qwen2.5-7B</h2>
+				<pre><code data-trim data-noescape class="language-python">
+				"What is the prevalence of vitamin D insufficiency in a general adult population?"
+				"How many polygons were used to approximate the surface of a face for realistic computer-generated animation?"
+				"What are the current challenges in key distribution for cryptography?"
+				"microcontroller based smart helmet using gsm and gprs"
+				"PID control methods for networked control systems with time delay and packet loss"
+				"comparison of clustering methods for cancer gene expression data"
+				"What is Zero-Knowledge Contingent Payment in cryptocurrencies?"
+				"categorical equational systems and term equational systems introduction"
+				"interactive recommender system for clinical pathways and personalized care"
+				"what are the key points of 5g architecture discussed in the ngnm alliance paper"
+				"what is pfinder and how does it work"
+				"syntactic simplification process and techniques"
+				"What is the impact of revisits on content popularity?"
+				"ble beacon based patient tracking system in smart care facilities"
+				</code></pre>
+				<p>No more "shoud" "should" "should" - nice!</p>
+			</section>
+			<section>
+				<h2>What about BEIR score?</h2>
+				<img src="img/beir-v4.png" height="450px">
+				<p>Results: at least now we're not worse than before</p>
+			</section>
+			<section>
+				<h2>What about 32B model?</h2>
+				<img src="img/beir-v5.png" height="450px">
+				<p>Results: OK better, but still not good</p>
+			</section>
+			<section>
+				<h2>Problem 1: Query format mismatch</h2>
+				<pre><code data-trim data-noescape class="language-text">
+doc: As a general rule, you must choose between a mileage deduction 
+or an actual expenses deduction.  The idea is that the mileage deduction 
+is supposed to cover all costs of using the car.  Exceptions include 
+parking fees and tolls, which can be deducted separately under either 
+method.  You explicitly cannot deduct insurance costs if you claim a 
+mileage deduction.   Separately, you probably won't be able to deduct 
+the deductible for your car as a casualty loss.  You first subtract 
+$100 from the deductible and then divide it by your Adjusted Gross 
+Income (AGI) from your tax return.  
+				</code></pre>
+				<ul>
+					<li><strong>beir</strong>: Business Expense - Car Insurance Deductible For Accident That Occurred
+						During a Business Trip</li>
+					<li><strong>qwen7</strong>: What are the rules for deducting car insurance costs on taxes?</li>
+					<li><strong>qwen32</strong>: can you deduct car insurance on taxes if you take the standard mileage
+						deduction</li>
+
+				</ul>
+			</section>
+			<section>
+				<h2>problem 2: not enough data?</h2>
+				<ul>
+					<li>Dataset size: ArguAna is only 1800 docs</li>
+					<li>Query diversity: mismatch between query styles</li>
+				</ul>
+				<p>Are we reinventing the wheel?</p>
+			</section>
+			<section>
+				<h2>EGG: Efficient Generalized Generator</h2>
+				<img src="img/egg.png" height="500px">
+			</section>
+			<section>
+				<h2>The plan</h2>
+				<ul>
+					<li>7 queries per doc: question, claim, argument, summary, ...</li>
+					<li>5k -> 50k random documents</li>
+					<li>Only Qwen2.5 7B - 96 hours on 2x 4090</li>
+				</ul>
+				<img src="img/rig.jpg" height="400px">
+			</section>
+			<section>
+				<h2>Query types</h2>
+				<ul>
+					<li><strong>Question</strong>: can you deduct car insurance on taxes if you take ...?</li>
+					<li><strong>Google</strong>: can you deduct car insurance on taxes</li>
+					<li><strong>Claim</strong>: You cannot deduct insurance costs if you claim ...
+					</li>
+					<li><strong>Title</strong>: Can You Deduct Car Insurance On Your Taxes?</li>
+					<li><strong>Entity</strong>: car deduction</li>
+					<li><strong>Summary</strong>: This document discusses rules for car expense ... </li>
+
+					<li><strong>Argument</strong>: ... difficulty of deducting car insurance deductibles ... </li>
+				</ul>
+			</section>
+			<section>
+				<h2>Results</h2>
+				<img src="img/beir-v6.png">
+				<p>Sometimes up, sometimes down, wtf?</p>
+			</section>
+			<section>
+				<h2>Loss trajectory</h2>
+				<img src="img/loss.png">
+				<p>"how to scare data scientist with a single graph"</p>
+			</section>
+			<section>
+				<h2>Open questions & next steps</h2>
+				<ul>
+					<li><strong>Training setup</strong>: why loss goes up?</li>
+					<li><strong>Impact of query types</strong>: more diverse != better?</li>
+					<li><strong>Better+bigger models</strong>: 300M and 500M models?</li>
+				</ul>
+			</section>
+			<section>
+				<h2>Bonus: language adaptation</h2>
+				<p>problem: your ML model is good at English, but bad at German</p>
+				<img src="img/alphabet.png">
 			</section>
 		</div>
 	</div>
