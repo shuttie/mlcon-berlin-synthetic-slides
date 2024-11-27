@@ -113,8 +113,8 @@
 				<p>Too many synthetic things at once!</p>
 				<ul>
 					<li>Query generation - 🫠</li>
+					<li>Negative/candidate mining - 😺</li>
 					<li>Label generation - 🫠</li>
-					<li>Negative mining - 😺</li>
 				</ul>
 			</section>
 			<section>
@@ -191,7 +191,8 @@
 				</ul>
 			</section>
 			<section>
-				<h2>todo: chatgpt</h2>
+				<h2>Hey ChatGPT, make a search query!</h2>
+				<img src="img/chatgpt.png">
 			</section>
 			<section>
 				<h2>Attempt #1: let's fine-tune!</h2>
@@ -224,10 +225,36 @@
 					}
 					  
 				</code></pre>
-				<p>Looks good, let's see the metrics!</p>
+				<p>Looks good, but is it a positive label?</p>
 			</section>
 			<section>
-				<h2>todo: GPT4 labels</h2>
+				<h2>Hey ChatGPT, is A relevant for query B?</h2>
+				<img src="img/llm-judge.png">
+			</section>
+			<section>
+				<h2>LLM as a relevance judge</h2>
+				<img src="img/label-prompt.png" height="600px">
+			</section>
+			<section>
+				<h2>Super sensitive to prompt</h2>
+				<img src="img/corr.png" style="margin: 0px;">
+			</section>
+			<section>
+				<h2>And still not SOTA :(</h2>
+				<img src="img/chatgpt-ranker.png" height="600px">
+			</section>
+			<section>
+				<h2>Cross-Encoders!</h2>
+				<p><img src="img/cross-encoder.png" height="300px"></p>
+				<ul>
+					<li>BERT, Mistral, Gemma2 - base</li>
+					<li>Trained on many query+doc+label triplets</li>
+					<li>SOTA <1B: BAAI/bge-reranker-v2-m3</li>
+				</ul>
+			</section>
+			<section>
+				<h2>Negative mining tool</h2>
+				<img src="img/negminer.png" height="600px">
 			</section>
 			<section>
 				<h2>BEIR: Evaluating search</h2>
