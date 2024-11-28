@@ -37,14 +37,6 @@
 				</ul>
 			</section>
 			<section>
-				<h2>Agenda</h2>
-				<ul>
-					<li>Fine-tuning with no training data?</li>
-					<li>Domain adaptation in search</li>
-					<li>Teaching your model to 说 إنجليزي </li>
-				</ul>
-			</section>
-			<section>
 				<h2>Nixiesearch</h2>
 				<p>A stateless search search engine</p>
 				<ul>
@@ -52,6 +44,14 @@
 					<li>Domain adaptation: fine-tunes to your data</li>
 				</ul>
 				<img src="img/separate-indexer.png" height="200px">
+			</section>
+			<section>
+				<h2>Agenda</h2>
+				<ul>
+					<li>Fine-tuning with no training data?</li>
+					<li>Domain adaptation in search</li>
+					<li>Teaching your model to 说 إنجليزي </li>
+				</ul>
 			</section>
 			<!--section>
 				<h2>Industry goes stateless</h2>
@@ -118,6 +118,9 @@
 				</ul>
 			</section>
 			<section>
+				<h2>query generation</h2>
+			</section>
+			<section>
 				<h2>docTTTTTquery</h2>
 				<p>github.com/castorini/docTTTTTquery</p>
 				<pre><code data-trim data-noescape class="language-python">
@@ -145,10 +148,11 @@
 			<section>
 				<h2>docTTTTTquery TLDR</h2>
 				<ul>
-					<li>Small T5 seq2seq model</li>
+					<li>"Small" T5 seq2seq model</li>
 					<li>Trained on query generation task</li>
 					<li><span class="fragment highlight-red">MSMARCO dataset</span>: <br>500k document-query pairs from Bing</li>
 				</ul>
+				<img src="img/doc2query.png" height="300px">
 			</section>
 			<section>
 				<h2>doc2query reality check</h2>
@@ -159,7 +163,7 @@
 					"international experts. Our events are designed to help professionals "
 					"elevate their skills, enhance their products, and improve effectiveness."
 				</code></pre>
-				<pre><code data-trim data-noescape>
+				<pre class="fragment"><code data-trim data-noescape>
 					sample 1: what is mlcon
 					sample 2: what is mlcon?
 					sample 3: what is mlcon?
@@ -191,10 +195,6 @@
 				</ul>
 			</section>
 			<section>
-				<h2>Hey ChatGPT, make a search query!</h2>
-				<img src="img/chatgpt.png">
-			</section>
-			<section>
 				<h2>Attempt #1: let's fine-tune!</h2>
 				<p>Premise:</p>
 				<ul>
@@ -210,22 +210,25 @@
 			</section>
 			<section>
 				<h2>generated query example</h2>
-				<pre><code data-trim data-noescape class="language-js">
-					{
-						"doc": "Hey guys. I am a Programmer Analyst Trainee at Cognizant "
-						       "Technology Solutions in the Advanced Java Domain. I joined Cognizant"
-							   "on 24th Dec 2015. I got an offer from Oracle Financial Services"
-							   "Software too as Associate Consutant. Should i join the latter or "
-							   "not. I am really confused pls i need a definitive direction to think. "
-							   "I feel coz i got a good domain (Advanced Java) in cognizant and i am "
-							   "quite good at Java programming i should not leave cognizant coz "
-							   "i am not sure what domain OFSS might put me in.",
-
-						"query": "should i join ofss or cognizent?"
-					}
-					  
+				<pre><code data-trim data-noescape class="language-python">
+					doc_text = "MLcon provides a focused, specialized learning environment "
+						"dedicated to Machine Learning, enabling attendees to explore the "
+						"latest trends, tools, and best practices with guidance from "
+						"international experts. Our events are designed to help professionals "
+						"elevate their skills, enhance their products, and improve effectiveness."
 				</code></pre>
-				<p>Looks good, but is it a positive label?</p>
+				<pre class="fragment"><code data-trim data-noescape>
+						sample 1: what is mlcon?
+						sample 2: what is MLcon?
+						sample 3: machine learning
+						sample 4: Machine Learning Conference
+						sample 5: what is mlcon
+						sample 6: what is an mlcon?
+						sample 7: what is machine learning for
+						sample 8: What is the purpose of mlcon
+						sample 9: is mlcon a credible organization?
+				</code></pre>
+				<p class="fragment">Looks better, but is it a positive label?</p>
 			</section>
 			<section>
 				<h2>Hey ChatGPT, is A relevant for query B?</h2>
@@ -245,7 +248,7 @@
 			</section>
 			<section>
 				<h2>Cross-Encoders!</h2>
-				<p><img src="img/cross-encoder.png" height="300px"></p>
+				<p><img src="img/cross-encoder.png" height="350px"></p>
 				<ul>
 					<li>BERT, Mistral, Gemma2 - base</li>
 					<li>Trained on many query+doc+label triplets</li>
@@ -309,6 +312,11 @@
 				</ul>
 				<img src="img/prompt.jpg">
 			</section>
+			<section>
+				<h2>Hey ChatGPT, make a search query!</h2>
+				<img src="img/chatgpt.png">
+			</section>
+
 			<section>
 				<h2>The plan</h2>
 				<ul>
@@ -402,7 +410,16 @@ Income (AGI) from your tax return.
 				<img src="img/egg.png" height="500px">
 			</section>
 			<section>
-				<h2>todo: few-shot learning</h2>
+				<h2>few-shot learning</h2>
+				<pre><code data-trim data-noescape class="language-text">
+					You are a search quality rater evaluating the relevance of web pages. 
+					Given a document, provide a single search query in a form of a question, 
+
+					You should follow the style of these example queries: 
+					1. XXX
+					2. YYY
+				</code></pre>
+				<img src="img/fewshot.png">
 			</section>
 			<section>
 				<h2>The plan</h2>
@@ -485,10 +502,24 @@ Income (AGI) from your tax return.
 			</section>
 			<section>
 				<h2>Links</h2>
-				TODO
+				<ul>
+					<li><strong>Nixiesearch</strong>: <a
+							href="https://github.com/nixiesearch/nixiesearch">github.com/nixiesearch/nixiesearch</a>
+					</li>
+					<li><strong>Negminer</strong>: <a
+							href="https://github.com/nixiesearch/negminer">github.com/nixiesearch/negminer</a>
+					</li>
+					<li><strong>Qwen2.5</strong>: <a
+							href="https://qwenlm.github.io/blog/qwen2.5/">qwenlm.github.io/blog/qwen2.5</a>
+					</li>
+				</ul>
+				<p><img src="img/qr.png" style="margin: 0px;"></p>
+				<small>[link to slides]</small>
 			</section>
 			<section>
-				questions?
+				<h1>questions?</h1>
+				<p><img src="img/qr.png" style="margin: 0px;"></p>
+				<small>[link to slides]</small>
 			</section>
 		</div>
 	</div>
